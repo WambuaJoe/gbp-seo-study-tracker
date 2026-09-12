@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBP + Local SEO — 6 Week Study Tracker</title>
+<style>
+  :root{
+    --bg:#152219;
+    --bg-2:#0f1912;
+    --card:#1d3125;
+    --card-hi:#24402f;
+    --line:#2d4a37;
+    --ink:#F1ECDE;
+    --ink-muted:#9FB3A2;
+    --accent:#E7A93D;
+    --accent-ink:#2a1e05;
+    --done:#6FA287;
+    --alert:#C1442E;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top, var(--bg-2), var(--bg) 60%);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px;}
+
+  header.top{
+    padding:28px 16px 20px;
+    border-bottom:2px solid var(--line);
+    background:linear-gradient(180deg, rgba(231,169,61,0.06), transparent);
+  }
+  .eyebrow{
+    color:var(--accent);
+    font-weight:700;
+    font-size:13px;
+    margin:0 0 6px;
+  }
+  h1{
+    font-size:26px;
+    line-height:1.15;
+    margin:0 0 8px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    color:var(--ink-muted);
+    font-size:14.5px;
+    line-height:1.5;
+    margin:0 0 20px;
+    max-width:52ch;
+  }
+
+  .progress-shell{
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:999px;
+    height:14px;
+    overflow:hidden;
+    position:relative;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--done), var(--accent));
+    width:0%;
+    transition:width .4s ease;
+  }
+  .progress-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:10px;
+    font-size:13px;
+    color:var(--ink-muted);
+  }
+  .progress-row b{color:var(--ink);font-size:14px;}
+
+  .weeknav{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding:14px 16px;
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    z-index:5;
+    border-bottom:1px solid var(--line);
+    -webkit-overflow-scrolling:touch;
+  }
+  .weeknav::-webkit-scrollbar{display:none;}
+  .wk-btn{
+    flex:0 0 auto;
+    background:var(--card);
+    border:1px solid var(--line);
+    color:var(--ink-muted);
+    padding:8px 13px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .wk-btn.active{
+    background:var(--accent);
+    color:var(--accent-ink);
+    border-color:var(--accent);
+  }
+  .wk-btn .dot{
+    display:inline-block;
+    width:6px;height:6px;border-radius:50%;
+    background:var(--done);
+    margin-left:6px;
+    vertical-align:middle;
+    opacity:0;
+  }
+  .wk-btn.complete .dot{opacity:1;}
+
+  main{padding:18px 16px 8px;}
+
+  .week-head{
+    margin:6px 0 16px;
+  }
+  .week-head h2{
+    font-size:19px;
+    margin:0 0 4px;
+    font-weight:800;
+  }
+  .week-head p.blurb{
+    margin:0 0 12px;
+    color:var(--ink-muted);
+    font-size:13.5px;
+  }
+  .week-progress-shell{
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:999px;
+    height:10px;
+    overflow:hidden;
+  }
+  .week-progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--done), var(--accent));
+    width:0%;
+    transition:width .4s ease;
+  }
+  .week-progress-label{
+    font-size:12px;
+    color:var(--ink-muted);
+    margin-top:6px;
+  }
+
+  .day{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    margin-bottom:12px;
+    overflow:hidden;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .day.done{
+    border-color:var(--done);
+    background:var(--card-hi);
+  }
+  .day-head{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:14px 14px;
+    cursor:pointer;
+  }
+  .status-badge{
+    flex:0 0 auto;
+    width:26px;height:26px;
+    border-radius:7px;
+    border:2px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    margin-top:2px;
+    font-size:11px;
+    font-weight:700;
+    color:var(--ink-muted);
+    background:var(--bg-2);
+  }
+  .day.done .status-badge{
+    background:var(--done);
+    border-color:var(--done);
+    color:#0f1912;
+    font-size:15px;
+  }
+  .day-titles{flex:1;min-width:0;}
+  .day-label{
+    font-size:12px;
+    color:var(--accent);
+    font-weight:700;
+    margin:0 0 2px;
+  }
+  .day-title{
+    font-size:15.5px;
+    font-weight:700;
+    margin:0;
+    line-height:1.3;
+  }
+  .hours{
+    font-size:11.5px;
+    color:var(--ink-muted);
+    white-space:nowrap;
+    margin-top:3px;
+  }
+  .caret{
+    flex:0 0 auto;
+    color:var(--ink-muted);
+    font-size:13px;
+    margin-top:6px;
+    transition:transform .2s ease;
+  }
+  .day.open .caret{transform:rotate(90deg);}
+
+  .day-body{
+    display:none;
+    padding:0 14px 16px 52px;
+  }
+  .day.open .day-body{display:block;}
+
+  .block{margin-bottom:12px;}
+  .block-label{
+    font-size:11px;
+    font-weight:700;
+    color:var(--ink-muted);
+    margin:0 0 5px;
+  }
+  ul.topics{
+    margin:0;padding-left:18px;
+    font-size:14px;
+    line-height:1.55;
+  }
+  ul.topics li{margin-bottom:3px;}
+  .why{
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--ink);
+    background:rgba(231,169,61,0.08);
+    border-left:3px solid var(--accent);
+    padding:8px 10px;
+    border-radius:0 6px 6px 0;
+  }
+  .exercise{
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--ink);
+    background:rgba(111,162,135,0.1);
+    border-left:3px solid var(--done);
+    padding:8px 10px;
+    border-radius:0 6px 6px 0;
+  }
+
+  .resource-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+  }
+  .resource-item{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:9px 10px;
+  }
+  .res-check{
+    flex:0 0 auto;
+    width:20px;height:20px;
+    border-radius:5px;
+    border:2px solid var(--line);
+    background:transparent;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    color:transparent;
+    font-size:12px;
+    margin-top:1px;
+  }
+  .resource-item.checked .res-check{
+    background:var(--done);
+    border-color:var(--done);
+    color:#0f1912;
+  }
+  .res-link{
+    flex:1;
+    min-width:0;
+    color:var(--ink);
+    font-size:13.5px;
+    line-height:1.4;
+    text-decoration:none;
+    border-bottom:1px dotted var(--ink-muted);
+  }
+  .resource-item.checked .res-link{
+    color:var(--ink-muted);
+    text-decoration:line-through;
+    border-bottom-color:transparent;
+  }
+  .res-domain{
+    display:block;
+    font-size:11px;
+    color:var(--ink-muted);
+    margin-top:2px;
+  }
+  .resource-note{
+    font-size:11.5px;
+    color:var(--ink-muted);
+    margin-top:6px;
+    line-height:1.4;
+  }
+
+  footer{
+    padding:22px 16px 10px;
+    text-align:center;
+  }
+  .reset{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--ink-muted);
+    font-size:12.5px;
+    padding:8px 14px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .save-note{
+    font-size:11.5px;
+    color:var(--ink-muted);
+    margin-top:8px;
+  }
+  .save-status{
+    min-height:16px;
+    font-size:11.5px;
+    color:var(--done);
+    margin-top:4px;
+  }
+  .save-status.error{color:var(--alert);}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">6-week study plan · 3–4 hrs/day</p>
+    <h1>Google Business Profile &amp; Local SEO, start to sellable</h1>
+    <p class="sub">Tap a day to open it. Check off each resource as you go through it — once every resource for a day is checked, the day marks itself done and closes automatically.</p>
+    <div class="progress-shell"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-row">
+      <span id="progressText">0 of 36 days complete</span>
+      <b id="progressPct">0%</b>
+    </div>
+  </div>
+</header>
+
+<nav class="weeknav" id="weekNav"></nav>
+
+<main class="wrap" id="mainContent"></main>
+
+<footer>
+  <button class="reset" id="resetBtn">Reset all progress</button>
+  <div class="save-note">Your checkmarks are saved on this browser, even after you close this page.</div>
+  <div class="save-status" id="saveStatus" role="status" aria-live="polite"></div>
+</footer>
+
+<script>
+const DATA = [
+{
+  title: "Week 1 — Google Business Profile Foundations",
+  blurb: "Understand how local search actually works, then build one real listing from zero to fully complete.",
+  days: [
+    {
+      label: "Day 1", title: "What GBP is & how local search works", hours: "3.5 hrs",
+      topics: ["The 3-pack vs. organic Maps results vs. website results","Google's three ranking factors: relevance, distance, prominence","What a Business Profile actually is vs. a website — they're not competitors"],
+      why: "You can't optimize a system you don't understand. This is the mental model everything else in the plan hangs off.",
+      exercise: "Search your own cafe/duka niche near you. Screenshot the 3-pack. For each business shown, guess why it's ranking (reviews? distance? category match?).",
+      resources: [
+        {label:"Get started with Google Business Profile", url:"https://support.google.com/business/answer/7039811"}
+      ]
+    },
+    {
+      label: "Day 2", title: "Creating & verifying a profile", hours: "3.5 hrs",
+      topics: ["Primary vs. secondary categories and why the primary one matters most","NAP consistency (Name, Address, Phone) — why it must match everywhere","Verification methods: postcard, phone, video, email — and common pitfalls"],
+      why: "A wrong category or a stuck verification silently kills visibility before optimization even starts.",
+      exercise: "Set up or claim one real GBP listing start to finish — your own business, or a friend's if you don't have one yet.",
+      resources: [
+        {label:"Verify your business on Google", url:"https://support.google.com/business/answer/7107242"}
+      ]
+    },
+    {
+      label: "Day 3", title: "Filling out a profile completely", hours: "3.5 hrs",
+      topics: ["Hours: regular, special, and holiday hours","Attributes (dine-in, takeout, Wi-Fi, wheelchair access, etc.)","Services/Products/Menu sections","Writing the business description within the 750-character limit"],
+      why: "Complete profiles get dramatically more clicks and calls than partial ones — this is the highest-leverage, lowest-skill work you'll do.",
+      exercise: "Fully complete every available field on the listing from Day 2. Leave nothing blank that could be filled.",
+      resources: [
+        {label:"Edit your Business Profile", url:"https://support.google.com/business/answer/3039617"},
+        {label:"Manage your business attributes", url:"https://support.google.com/business/answer/9049526"}
+      ]
+    },
+    {
+      label: "Day 4", title: "Photos, Posts & Products", hours: "3.5 hrs",
+      topics: ["Photo categories Google rewards: exterior, interior, team, product/food","Basic image sizing and quality rules","Google Posts: offers, updates, events — and how often to publish","Products vs. Services tabs and when to use each"],
+      why: "Photos are consistently the #1 factor in whether someone picks you over the next listing in the map pack.",
+      exercise: "Upload at least 10 categorized photos and publish one Google Post.",
+      resources: [
+        {label:"Manage your Business Profile photos & videos", url:"https://support.google.com/business/answer/6103862"},
+        {label:"Create & manage posts on your Business Profile", url:"https://support.google.com/business/answer/7342169"}
+      ]
+    },
+    {
+      label: "Day 5", title: "Reviews & Q&A", hours: "3.5 hrs",
+      topics: ["Why review count, recency, and keyword-rich content affect ranking","Ethical ways to prompt reviews (timing, method) vs. what violates policy","Structuring responses: positive, neutral, negative","Managing the public Q&A section proactively"],
+      why: "Reviews are both a ranking factor and a trust factor. Most small business owners ignore this completely — it's an easy, visible win.",
+      exercise: "Write three reusable review-response templates: positive, neutral, and negative.",
+      resources: [
+        {label:"Manage customer reviews", url:"https://support.google.com/business/answer/3474050"},
+        {label:"Tips to get more reviews", url:"https://support.google.com/business/answer/3474122"}
+      ]
+    },
+    {
+      label: "Day 6", title: "GBP Insights & practice day", hours: "4 hrs",
+      topics: ["Reading the Insights dashboard: calls, direction requests, website clicks","Which search terms are actually bringing people to the listing","What 'good' numbers look like for a small local business"],
+      why: "This closes the loop — you need to be able to show a client their numbers improving, not just say you 'did SEO'.",
+      exercise: "Take a real business — yours, a friend's, or a willing local shop — and run a full A-to-Z GBP setup or optimization. This becomes your first case study.",
+      resources: [
+        {label:"Understand your Business Profile performance & insights", url:"https://support.google.com/business/answer/9918094"}
+      ]
+    }
+  ]
+},
+{
+  title: "Week 2 — Local SEO Fundamentals",
+  blurb: "Move beyond the GBP listing itself into the wider local-SEO system: citations, on-page basics, and keyword research.",
+  days: [
+    {
+      label: "Day 1", title: "What local SEO is (and isn't)", hours: "3.5 hrs",
+      topics: ["Local pack vs. organic results — different games, different rules","The three pillars: GBP, citations, on-site signals","How Google decides a search has 'local intent'"],
+      why: "Clients will conflate 'SEO' and 'GBP'. You need to know precisely where one ends and the other starts.",
+      exercise: "Map the three local-SEO pillars against one target business — write one sentence on where it stands in each.",
+      resources: [
+        {label:"A Beginner's Guide to Local SEO", url:"https://gofishdigital.com/blog/beginners-guide-local-seo/"}
+      ]
+    },
+    {
+      label: "Day 2", title: "NAP consistency & citations", hours: "3.5 hrs",
+      topics: ["What a citation is and why mismatched Name/Address/Phone hurts rankings","Key directories: Yellow Pages Kenya, Facebook, TripAdvisor (for food/drink), Yelp","Data aggregators vs. manual directory listings"],
+      why: "Inconsistent NAP is one of the most common — and most fixable — problems in local business listings.",
+      exercise: "Audit one business's NAP across 5 platforms. Log every mismatch you find.",
+      resources: [
+        {label:"What is NAP in Local SEO? — BrightLocal", url:"https://www.brightlocal.com/learn/what-is-nap/"}
+      ]
+    },
+    {
+      label: "Day 3", title: "On-page local SEO basics", hours: "3.5 hrs",
+      topics: ["Title tags and meta descriptions","Header structure (H1/H2) and local keyword placement","Embedding a Google Map on a website"],
+      why: "Even a one-page website can be tuned to reinforce what the GBP listing is already telling Google.",
+      exercise: "Rewrite the homepage title tag and meta description for a local business.",
+      resources: [
+        {label:"SEO Starter Guide — Google Search Central", url:"https://developers.google.com/search/docs/fundamentals/seo-starter-guide"}
+      ]
+    },
+    {
+      label: "Day 4", title: "Google Search Console setup", hours: "3.5 hrs",
+      topics: ["Verifying a website in Search Console","Submitting a sitemap","Reading Performance reports: clicks, impressions, CTR, average position","Spotting basic indexing issues"],
+      why: "Search Console is free and it's the single best window into what Google actually sees on a client's site.",
+      exercise: "Set up Search Console on a real site — yours or a willing client's.",
+      resources: [
+        {label:"Get started with Search Console", url:"https://support.google.com/webmasters/answer/9128669"}
+      ]
+    },
+    {
+      label: "Day 5", title: "Local keyword research", hours: "3.5 hrs",
+      topics: ["'Near me' search intent and neighborhood/city modifiers","Free tools: Google Keyword Planner, autocomplete, 'People also search for'","Weighing search volume against realistic competition"],
+      why: "You can't write good copy or GBP posts around keywords you haven't identified.",
+      exercise: "Build a 20-keyword list for a cafe, liquor store, or club.",
+      resources: [
+        {label:"Google Keyword Planner", url:"https://business.google.com/us/ad-tools/keyword-planner/"}
+      ]
+    },
+    {
+      label: "Day 6", title: "Practice — local SEO audit", hours: "4 hrs",
+      topics: ["Pulling everything from this week into one audit format"],
+      why: "A tight one-page audit is one of your best sales tools — it makes the business's problems concrete before you've asked for a shilling.",
+      exercise: "Produce a one-page audit (NAP issues, missing citations, on-page gaps, keyword opportunities) for a real business. This becomes a reusable audit template.",
+      resources: [
+        {label:"How to Optimize Local Citations — BrightLocal", url:"https://www.brightlocal.com/learn/local-citations/managing-local-citations/optimizing-local-citations/"}
+      ]
+    }
+  ]
+},
+{
+  title: "Week 3 — Content & On-Page SEO",
+  blurb: "Go one layer deeper into the website itself: structure, content, technical basics, schema, and links.",
+  days: [
+    {
+      label: "Day 1", title: "On-page SEO fundamentals", hours: "3.5 hrs",
+      topics: ["URL structure and internal linking","Image alt text","Mobile-friendliness basics"],
+      why: "These are small, mechanical fixes that compound — and most small business sites get all of them wrong.",
+      exercise: "Do a full on-page checklist pass on one real site.",
+      resources: [
+        {label:"SEO Starter Guide — Google Search Central", url:"https://developers.google.com/search/docs/fundamentals/seo-starter-guide"}
+      ]
+    },
+    {
+      label: "Day 2", title: "Content strategy for local businesses", hours: "3.5 hrs",
+      topics: ["Service/menu pages vs. generic 'About Us' content","Location pages for multi-branch businesses","Blog or update content that actually drives local traffic (not generic advice)"],
+      why: "Content is where most local businesses waste effort on the wrong things — a menu page beats ten unfocused blog posts.",
+      exercise: "Outline one service or menu page for a real business.",
+      resources: [
+        {label:"SEO Starter Guide — Google Search Central", url:"https://developers.google.com/search/docs/fundamentals/seo-starter-guide"}
+      ]
+    },
+    {
+      label: "Day 3", title: "Technical SEO basics", hours: "3.5 hrs",
+      topics: ["Site speed and PageSpeed Insights","Core Web Vitals overview","Mobile-first indexing, in plain terms"],
+      why: "You don't need to be a developer — you need to know what to flag and roughly why it matters.",
+      exercise: "Run PageSpeed Insights on 3 local business sites and note the top issue on each.",
+      resources: [
+        {label:"PageSpeed Insights", url:"https://pagespeed.web.dev/"},
+        {label:"Web Vitals — web.dev", url:"https://web.dev/articles/vitals"}
+      ]
+    },
+    {
+      label: "Day 4", title: "Schema markup for local business", hours: "3.5 hrs",
+      topics: ["What structured data is, in plain terms","LocalBusiness / Restaurant schema specifically","Testing markup with Google's Rich Results Test","What schema helps with — and what it doesn't guarantee"],
+      why: "This is a technical-sounding skill few local competitors will have, which makes it a good differentiator.",
+      exercise: "Write and test one LocalBusiness schema snippet for a real business.",
+      resources: [
+        {label:"Local Business (LocalBusiness) Structured Data — Google Search Central", url:"https://developers.google.com/search/docs/appearance/structured-data/local-business"},
+        {label:"Rich Results Test", url:"https://search.google.com/test/rich-results"}
+      ]
+    },
+    {
+      label: "Day 5", title: "Backlinks & local link building", hours: "3.5 hrs",
+      topics: ["What backlinks are and why they matter less locally than nationally","Local link sources: sponsorships, local blogs/press, supplier partnerships, chambers of commerce"],
+      why: "Local link building is slower and lower-priority than GBP/citations — know it exists, but don't oversell it.",
+      exercise: "List 5 realistic local link opportunities for one target business.",
+      resources: [
+        {label:"9 Easy Local Link Building Tactics — Ahrefs", url:"https://ahrefs.com/blog/local-link-building/"}
+      ]
+    },
+    {
+      label: "Day 6", title: "Practice — implement on-page fixes", hours: "4 hrs",
+      topics: ["Applying schema + title/meta fixes on a live or demo site"],
+      why: "Doing it once, for real, is worth more than a week of reading about it.",
+      exercise: "Implement schema markup and title/meta fixes on a real or demo site. Screenshot before/after.",
+      resources: [
+        {label:"Rich Results Test", url:"https://search.google.com/test/rich-results"},
+        {label:"PageSpeed Insights", url:"https://pagespeed.web.dev/"}
+      ]
+    }
+  ]
+},
+{
+  title: "Week 4 — Advanced Local SEO & GBP Tactics",
+  blurb: "The tactics that separate a basic setup job from a genuine local-SEO service — competitive analysis, reputation, and automation-adjacent thinking.",
+  days: [
+    {
+      label: "Day 1", title: "Advanced ranking factor optimization", hours: "3.5 hrs",
+      topics: ["Proximity manipulation: myths vs. what's actually controllable","Service-area business (SAB) setup for businesses without a storefront","Multi-location strategy basics"],
+      why: "This is where you start sounding like a specialist instead of someone who just filled out a form.",
+      exercise: "Identify whether a target business should be a storefront listing or a service-area listing, and why.",
+      resources: [
+        {label:"Manage your service areas for service-area & hybrid businesses", url:"https://support.google.com/business/answer/9157481"}
+      ]
+    },
+    {
+      label: "Day 2", title: "Review generation systems", hours: "3.5 hrs",
+      topics: ["Designing an automated review-request flow (SMS/WhatsApp/email post-purchase)","Timing the ask for maximum response","Google's review policy — what counts as incentivized and is against the rules"],
+      why: "This is the first day where your automation background becomes a direct differentiator, not just a bonus skill.",
+      exercise: "Sketch the trigger → delay → send flow for a review-request system on paper.",
+      resources: [
+        {label:"Prohibited & restricted content (Fake Engagement policy) — Google Maps", url:"https://support.google.com/contributionpolicy/answer/7400114"},
+        {label:"Google Business Profile node — n8n Docs", url:"https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlebusinessprofile"}
+      ]
+    },
+    {
+      label: "Day 3", title: "Competitor analysis", hours: "3.5 hrs",
+      topics: ["Reverse-engineering why a competitor outranks a client","Comparing categories, review count/quality, citations, content depth","Building a structured gap-analysis document"],
+      why: "A gap analysis makes your pitch concrete — 'here's exactly what they have that you don't' is far more persuasive than generic promises.",
+      exercise: "Pick a real business and a real local competitor. Build a one-page gap analysis between them.",
+      resources: [
+        {label:"Local Falcon — visibility & rank comparison", url:"https://www.localfalcon.com/"},
+        {label:"BrightLocal — local SEO tools", url:"https://www.brightlocal.com/"}
+      ]
+    },
+    {
+      label: "Day 4", title: "GBP messaging & Q&A automation", hours: "3.5 hrs",
+      topics: ["Note: Google retired GBP chat/messaging in July 2024 — it's no longer an available feature","Seeding your own FAQ into the public Q&A section before customers ask","Where n8n could route inquiries (e.g. to WhatsApp) instead of relying on GBP messaging"],
+      why: "Knowing what's actually still live in the product matters as much as knowing the tactic — this feature was removed, so plan around it.",
+      exercise: "Write 5 FAQ entries to seed into a listing's Q&A section.",
+      resources: [
+        {label:"Google Business Profile node (Reviews: Get, Reply) — n8n Docs", url:"https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlebusinessprofile"}
+      ]
+    },
+    {
+      label: "Day 5", title: "Reputation management & recovery", hours: "3.5 hrs",
+      topics: ["Handling a pile-up of negative reviews without panic","Common causes of GBP suspension","The reinstatement process, and guideline violations to avoid in the first place"],
+      why: "Sooner or later a client will have a bad week of reviews or a suspended listing — you need a calm, practiced response.",
+      exercise: "Write a step-by-step response plan for 'client just got 3 one-star reviews in a week'.",
+      resources: [
+        {label:"Fix suspended or disabled profiles", url:"https://support.google.com/business/answer/4569145"}
+      ]
+    },
+    {
+      label: "Day 6", title: "Practice — full gap analysis", hours: "4 hrs",
+      topics: ["Combining competitor analysis, reviews, and citations into one strategy document"],
+      why: "This document doubles as both a learning exercise and a sales asset for your first real pitches.",
+      exercise: "Build a full gap-analysis + strategy doc for a real prospect business.",
+      resources: [
+        {label:"Local Falcon — visibility & rank comparison", url:"https://www.localfalcon.com/"},
+        {label:"9 Easy Local Link Building Tactics — Ahrefs", url:"https://ahrefs.com/blog/local-link-building/"}
+      ]
+    }
+  ]
+},
+{
+  title: "Week 5 — Tools, Analytics & Automation",
+  blurb: "Bring in the measurement layer and start folding in n8n so the service scales without scaling your hours.",
+  days: [
+    {
+      label: "Day 1", title: "Google Analytics 4 basics", hours: "3.5 hrs",
+      topics: ["Traffic sources and how to read them","Setting up basic conversion/goal tracking","Connecting GA4 data back to GBP website clicks"],
+      why: "GA4 is where you prove the website side of the work is paying off, not just the listing side.",
+      exercise: "Set up GA4 on a real site and confirm data is flowing in.",
+      resources: [
+        {label:"Set up Analytics for a website and/or app", url:"https://support.google.com/analytics/answer/9304153"}
+      ]
+    },
+    {
+      label: "Day 2", title: "Rank tracking tools", hours: "3.5 hrs",
+      topics: ["Local Falcon and BrightLocal free trials","Manual rank-tracking method as a free fallback","What 'map pack rank' means practically for a small business"],
+      why: "Clients want to know 'are we moving up' — you need a repeatable way to answer that.",
+      exercise: "Run one rank check (tool or manual) for a real business and record the baseline.",
+      resources: [
+        {label:"Local Falcon", url:"https://www.localfalcon.com/"},
+        {label:"BrightLocal", url:"https://www.brightlocal.com/"}
+      ]
+    },
+    {
+      label: "Day 3", title: "SEO audit tooling", hours: "3.5 hrs",
+      topics: ["Screaming Frog free tier","Ubersuggest and other free alternatives to SEMrush/Ahrefs","What to actually check with each tool vs. what's noise"],
+      why: "Free tiers of these tools are enough for small local sites — you don't need an expensive subscription to start.",
+      exercise: "Run one free-tier audit tool on a real site and pull out the top 3 actionable findings.",
+      resources: [
+        {label:"Screaming Frog SEO Spider (free, 500 URLs)", url:"https://www.screamingfrog.co.uk/seo-spider/"},
+        {label:"Ubersuggest", url:"https://neilpatel.com/ubersuggest/"}
+      ]
+    },
+    {
+      label: "Day 4", title: "Automating reporting with n8n", hours: "3.5 hrs",
+      topics: ["Pulling GBP Insights / GA4 / rank data into one place","Auto-generating a simple client report on a schedule"],
+      why: "This is where your existing n8n skillset directly compounds the SEO service — most local-SEO freelancers do this manually or not at all.",
+      exercise: "Sketch (or start building) an n8n workflow that pulls one data source into a formatted report.",
+      resources: [
+        {label:"Schedule Trigger node — n8n Docs", url:"https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger"},
+        {label:"Google Business Profile node — n8n Docs", url:"https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlebusinessprofile"}
+      ]
+    },
+    {
+      label: "Day 5", title: "Automated review-request workflow", hours: "3.5 hrs",
+      topics: ["Designing the actual workflow: trigger (order/POS or manual) → delay → send","Choosing the channel: WhatsApp, SMS, or email","Including a direct review link"],
+      why: "This turns Day 2 of Week 4's sketch into something you can actually sell as part of a package.",
+      exercise: "Build the review-request workflow in n8n, even in skeleton form.",
+      resources: [
+        {label:"Twilio node (SMS/WhatsApp) — n8n Docs", url:"https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.twilio"}
+      ]
+    },
+    {
+      label: "Day 6", title: "Practice — ship one automation", hours: "4 hrs",
+      topics: ["Finishing and testing one real automation end-to-end"],
+      why: "A working automation, not just a diagram, is what separates you from every other person offering 'GBP setup'.",
+      exercise: "Finish and test one automation — either the review-request flow or the automated reporting flow — end-to-end.",
+      resources: [
+        {label:"Schedule Trigger node — n8n Docs", url:"https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger"},
+        {label:"Twilio node (SMS/WhatsApp) — n8n Docs", url:"https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.twilio"}
+      ]
+    }
+  ]
+},
+{
+  title: "Week 6 — Productization & Sales",
+  blurb: "Turn five weeks of learning into an actual package with pricing, sales materials, and your first pitches.",
+  days: [
+    {
+      label: "Day 1", title: "Structuring your service package", hours: "3.5 hrs",
+      topics: ["Tiering: Basic GBP setup / Standard GBP + Local SEO / Premium + Automation","Deciding what's genuinely worth including at each tier"],
+      why: "A tiered offer is easier to sell than one flat price — it lets a hesitant buyer say yes at a lower commitment.",
+      exercise: "Draft your 3 tiers with a one-line description of what's included in each.",
+      resources: [
+        {label:"How to Price Local SEO Services Effectively", url:"https://pricinglink.com/knowledge-base/local-seo-for-small-business/how-to-price-local-seo-services/"}
+      ]
+    },
+    {
+      label: "Day 2", title: "Pricing strategy", hours: "3.5 hrs",
+      topics: ["Setup fee vs. recurring retainer","Bundling with automation to protect margin","Anchoring pricing against realistic local market rates"],
+      why: "Price too low and you can't sustain the recurring work; price too high for the local market and nobody buys.",
+      exercise: "Write out final pricing for all 3 tiers, both setup fee and monthly retainer.",
+      resources: [
+        {label:"How to Price Local SEO Services Effectively", url:"https://pricinglink.com/knowledge-base/local-seo-for-small-business/how-to-price-local-seo-services/"}
+      ]
+    },
+    {
+      label: "Day 3", title: "Building sales materials", hours: "3.5 hrs",
+      topics: ["One-pager structure for a service pitch","Turning your Week 2 and Week 4 templates into a before/after case study"],
+      why: "Your practice work over the last 5 weeks is not just learning — it's your first proof of results.",
+      exercise: "Build a one-page sales sheet using your real case study business.",
+      resources: [
+        {label:"How to Write a Case Study — HubSpot", url:"https://blog.hubspot.com/blog/tabid/6307/bid/33282/the-ultimate-guide-to-creating-compelling-case-studies.aspx"}
+      ]
+    },
+    {
+      label: "Day 4", title: "Outreach & pitching", hours: "3.5 hrs",
+      topics: ["Approaching cafes, dukas, liquor stores, and clubs specifically","Opening scripts for a cold walk-in or phone pitch","Handling 'I don't need this' and 'too expensive'"],
+      why: "The best package in the world doesn't matter if you can't get in front of the owner and make the ask.",
+      exercise: "Write and rehearse one 60-second pitch script.",
+      resources: [
+        {label:"Sales scripts to prospect small businesses", url:"https://re2.ai/blog/sales-scripts-to-prospect-small-businesses"}
+      ]
+    },
+    {
+      label: "Day 5", title: "Building your portfolio proof", hours: "3.5 hrs",
+      topics: ["Turning weeks 1–5 of practice work into a polished case study or portfolio page"],
+      why: "Prospects trust a real before/after far more than a promise.",
+      exercise: "Finalize one polished case study page from your practice work.",
+      resources: [
+        {label:"How To Make an SEO Portfolio That Attracts Clients — Upwork", url:"https://www.upwork.com/resources/how-to-make-an-seo-portfolio"}
+      ]
+    },
+    {
+      label: "Day 6", title: "Launch week — first pitches", hours: "4 hrs",
+      topics: ["Finalizing package doc and pricing sheet","Making real outreach contact"],
+      why: "This is the actual point of the whole six weeks — everything before this was preparation for this day.",
+      exercise: "Finalize your package doc and pricing sheet, then make your first 5 real outreach pitches.",
+      resources: [
+        {label:"Sales scripts to prospect small businesses", url:"https://re2.ai/blog/sales-scripts-to-prospect-small-businesses"},
+        {label:"How to Price Local SEO Services Effectively", url:"https://pricinglink.com/knowledge-base/local-seo-for-small-business/how-to-price-local-seo-services/"}
+      ]
+    }
+  ]
+}
+];
+
+const STORAGE_KEY = "gbp_seo_tracker_resources_v3";
+const LEGACY_STORAGE_KEY = "gbp_seo_tracker_resources_v2";
+let checked = {}; // resource-level checked state, keyed by "w-d-r"
+let currentWeek = 0;
+
+function domainOf(url){
+  try{ return new URL(url).hostname.replace(/^www\./,""); }catch(e){ return url; }
+}
+
+function setSaveStatus(message, isError=false){
+  const status = document.getElementById("saveStatus");
+  if(!status) return;
+  status.textContent = message;
+  status.classList.toggle("error", isError);
+}
+
+function loadProgress(){
+  try{
+    // Prefer the current format, but migrate progress from the earlier key if present.
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+    if(raw){
+      const saved = JSON.parse(raw);
+      if(saved && typeof saved === "object" && !Array.isArray(saved)){
+        checked = saved.checked && typeof saved.checked === "object" ? saved.checked : saved;
+        if(Number.isInteger(saved.currentWeek) && saved.currentWeek >= 0 && saved.currentWeek < DATA.length){
+          currentWeek = saved.currentWeek;
+        }
+      }
+    }
+    setSaveStatus(raw ? "Progress restored from this browser." : "Ready — progress will save automatically.");
+  }catch(e){
+    checked = {};
+    setSaveStatus("Browser storage is unavailable; progress cannot be saved.", true);
+  }
+}
+
+function saveProgress(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      version: 3,
+      checked,
+      currentWeek,
+      savedAt: new Date().toISOString()
+    }));
+    setSaveStatus("Saved just now.");
+    return true;
+  }catch(e){
+    setSaveStatus("Could not save in this browser. Check storage permissions.", true);
+    return false;
+  }
+}
+
+function resKey(w,d,r){ return w+"-"+d+"-"+r; }
+
+function dayIsDone(wi,di){
+  const day = DATA[wi].days[di];
+  if(!day.resources || day.resources.length===0) return false;
+  return day.resources.every((_,ri)=>checked[resKey(wi,di,ri)]);
+}
+
+function totalDays(){
+  return DATA.reduce((sum,wk)=>sum+wk.days.length,0);
+}
+function completedDaysCount(){
+  let n=0;
+  DATA.forEach((wk,wi)=>wk.days.forEach((_,di)=>{ if(dayIsDone(wi,di)) n++; }));
+  return n;
+}
+function weekCompletedCount(wi){
+  let n=0;
+  DATA[wi].days.forEach((_,di)=>{ if(dayIsDone(wi,di)) n++; });
+  return n;
+}
+function weekComplete(wi){
+  return weekCompletedCount(wi) === DATA[wi].days.length;
+}
+
+function renderNav(){
+  const nav = document.getElementById("weekNav");
+  nav.innerHTML = "";
+  DATA.forEach((wk,wi)=>{
+    const btn = document.createElement("button");
+    btn.className = "wk-btn" + (wi===currentWeek ? " active":"") + (weekComplete(wi) ? " complete":"");
+    btn.innerHTML = "Week "+(wi+1)+"<span class='dot'></span>";
+    btn.onclick = ()=>{ currentWeek = wi; saveProgress(); render(); };
+    nav.appendChild(btn);
+  });
+}
+
+function renderMain(){
+  const main = document.getElementById("mainContent");
+  main.innerHTML = "";
+  const wk = DATA[currentWeek];
+
+  const head = document.createElement("div");
+  head.className = "week-head";
+  const wDone = weekCompletedCount(currentWeek);
+  const wTotal = wk.days.length;
+  const wPct = wTotal ? Math.round((wDone/wTotal)*100) : 0;
+  head.innerHTML = `
+    <h2>${wk.title}</h2>
+    <p class="blurb">${wk.blurb}</p>
+    <div class="week-progress-shell"><div class="week-progress-fill" style="width:${wPct}%"></div></div>
+    <p class="week-progress-label">${wDone} of ${wTotal} days complete this week</p>
+  `;
+  main.appendChild(head);
+
+  wk.days.forEach((day, di)=>{
+    const isDone = dayIsDone(currentWeek, di);
+    const doneCount = day.resources.filter((_,ri)=>checked[resKey(currentWeek,di,ri)]).length;
+    const card = document.createElement("div");
+    card.className = "day" + (isDone ? " done":"");
+    card.id = "day-"+currentWeek+"-"+di;
+
+    const topicsHtml = day.topics.map(t=>"<li>"+t+"</li>").join("");
+    const resourcesHtml = day.resources.map((res,ri)=>{
+      const rKey = resKey(currentWeek, di, ri);
+      const isChecked = !!checked[rKey];
+      return `
+        <li class="resource-item ${isChecked?'checked':''}" data-rkey="${rKey}">
+          <div class="res-check">✓</div>
+          <a class="res-link" href="${res.url}" target="_blank" rel="noopener">
+            ${res.label}
+            <span class="res-domain">${domainOf(res.url)}</span>
+          </a>
+        </li>
+      `;
+    }).join("");
+
+    card.innerHTML = `
+      <div class="day-head">
+        <div class="status-badge">${isDone ? "✓" : doneCount + "/" + day.resources.length}</div>
+        <div class="day-titles">
+          <p class="day-label">${day.label}</p>
+          <p class="day-title">${day.title}</p>
+          <p class="hours">${day.hours}</p>
+        </div>
+        <div class="caret">▸</div>
+      </div>
+      <div class="day-body">
+        <div class="block">
+          <p class="block-label">Cover</p>
+          <ul class="topics">${topicsHtml}</ul>
+        </div>
+        <div class="block">
+          <p class="block-label">Why it matters</p>
+          <div class="why">${day.why}</div>
+        </div>
+        <div class="block">
+          <p class="block-label">Practice</p>
+          <div class="exercise">${day.exercise}</div>
+        </div>
+        <div class="block">
+          <p class="block-label">Resources — check each off as you finish it</p>
+          <ul class="resource-list">${resourcesHtml}</ul>
+          <p class="resource-note">Checking the last resource marks this day done and closes it automatically.</p>
+        </div>
+      </div>
+    `;
+
+    const headEl = card.querySelector(".day-head");
+    headEl.addEventListener("click", ()=>{
+      card.classList.toggle("open");
+    });
+
+    card.querySelectorAll(".resource-item").forEach(item=>{
+      item.querySelector(".res-check").addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const rKey = item.getAttribute("data-rkey");
+        checked[rKey] = !checked[rKey];
+        saveProgress();
+
+        const nowDone = dayIsDone(currentWeek, di);
+        render();
+
+        if(nowDone){
+          // leave the newly-completed day closed; scroll it into gentle view
+          setTimeout(()=>{
+            const el = document.getElementById("day-"+currentWeek+"-"+di);
+            if(el){ el.classList.remove("open"); }
+          },0);
+        } else {
+          // keep this day open if it isn't finished yet
+          setTimeout(()=>{
+            const el = document.getElementById("day-"+currentWeek+"-"+di);
+            if(el){ el.classList.add("open"); }
+          },0);
+        }
+      });
+      // also let clicking the link row itself (not the check) open normally without toggling
+    });
+
+    main.appendChild(card);
+  });
+}
+
+function renderProgress(){
+  const total = totalDays();
+  const done = completedDaysCount();
+  const pct = total ? Math.round((done/total)*100) : 0;
+  document.getElementById("progressFill").style.width = pct+"%";
+  document.getElementById("progressText").textContent = done+" of "+total+" days complete";
+  document.getElementById("progressPct").textContent = pct+"%";
+}
+
+function render(){
+  renderNav();
+  renderMain();
+  renderProgress();
+}
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(!confirm("Reset all study progress? This cannot be undone.")) return;
+  checked = {};
+  saveProgress();
+  render();
+});
+
+(()=>{
+  loadProgress();
+  render();
+})();
+
+// If the same tracker is open in another tab, keep this tab in sync.
+window.addEventListener("storage", (event)=>{
+  if(event.key !== STORAGE_KEY || !event.newValue) return;
+  try{
+    const saved = JSON.parse(event.newValue);
+    checked = saved.checked || {};
+    if(Number.isInteger(saved.currentWeek) && saved.currentWeek >= 0 && saved.currentWeek < DATA.length){
+      currentWeek = saved.currentWeek;
+    }
+    setSaveStatus("Progress updated from another tab.");
+    render();
+  }catch(e){ /* Ignore malformed external storage updates. */ }
+});
+</script>
+
+</body>
+</html>
