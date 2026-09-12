@@ -84,7 +84,8 @@
   .weeknav{
     display:flex;
     gap:6px;
-    overflow-x:auto;
+    justify-content:center;
+    flex-wrap:wrap;
     padding:14px 16px;
     position:sticky;
     top:0;
@@ -93,7 +94,6 @@
     border-bottom:1px solid var(--line);
     -webkit-overflow-scrolling:touch;
   }
-  .weeknav::-webkit-scrollbar{display:none;}
   .wk-btn{
     flex:0 0 auto;
     background:var(--card);
@@ -105,6 +105,10 @@
     font-weight:600;
     cursor:pointer;
     white-space:nowrap;
+  }
+  @media (max-width:480px){
+    .weeknav{gap:8px;padding:12px 10px;}
+    .wk-btn{padding:8px 11px;font-size:12px;}
   }
   .wk-btn.active{
     background:var(--accent);
