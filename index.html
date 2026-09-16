@@ -348,6 +348,10 @@
     margin-top:4px;
   }
   .save-status.error{color:var(--alert);}
+  .account-row{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .account-btn{background:var(--accent);border:1px solid var(--accent);color:var(--accent-ink);font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;}
+  .account-btn.secondary{background:none;color:var(--ink-muted);border-color:var(--line);}
+  .account-label{font-size:11.5px;color:var(--ink-muted);}
 </style>
 </head>
 <body>
@@ -373,9 +377,33 @@
   <button class="reset" id="resetBtn">Reset all progress</button>
   <div class="save-note">Your checkmarks are saved on this browser, even after you close this page.</div>
   <div class="save-status" id="saveStatus" role="status" aria-live="polite"></div>
+  <div class="account-row">
+    <button class="account-btn" id="signInBtn">Sign in with Google to sync</button>
+    <button class="account-btn secondary" id="signOutBtn" hidden>Sign out</button>
+    <span class="account-label" id="accountLabel"></span>
+  </div>
 </footer>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBUGMAUgv6G_R-ehUZYjNcsn83DXt3MKtw",
+  authDomain: "gbp-seo-study-tracker.firebaseapp.com",
+  projectId: "gbp-seo-study-tracker",
+  storageBucket: "gbp-seo-study-tracker.firebasestorage.app",
+  messagingSenderId: "1007357504179",
+  appId: "1:1007357504179:web:5b42dcdad4736f02591ec6"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
+let signedInUser = null;
+let cloudSaveTimer = null;
+
 const DATA = [
 {
   title: "Week 1 — Google Business Profile Foundations",
@@ -791,18 +819,50 @@ function loadProgress(){
 
 function saveProgress(){
   try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    const progress = {
       version: 3,
       checked,
       currentWeek,
       savedAt: new Date().toISOString()
-    }));
-    setSaveStatus("Saved just now.");
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    if(signedInUser){
+      clearTimeout(cloudSaveTimer);
+      cloudSaveTimer = setTimeout(()=>saveToCloud(progress), 250);
+      setSaveStatus("Saved on this device; syncing…");
+    } else {
+      setSaveStatus("Saved on this device. Sign in to sync across devices.");
+    }
     return true;
   }catch(e){
     setSaveStatus("Could not save in this browser. Check storage permissions.", true);
     return false;
   }
+}
+
+async function saveToCloud(progress){
+  if(!signedInUser) return;
+  try{
+    await setDoc(doc(db, "progress", signedInUser.uid), progress);
+    setSaveStatus("Saved and synced across your devices.");
+  }catch(e){ setSaveStatus("Saved on this device, but cloud sync failed.", true); }
+}
+
+async function loadFromCloud(){
+  if(!signedInUser) return;
+  try{
+    const snapshot = await getDoc(doc(db, "progress", signedInUser.uid));
+    if(snapshot.exists()){
+      const saved = snapshot.data();
+      checked = saved.checked || {};
+      if(Number.isInteger(saved.currentWeek) && saved.currentWeek >= 0 && saved.currentWeek < DATA.length){ currentWeek = saved.currentWeek; }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+      setSaveStatus("Cloud progress loaded and synced.");
+      render();
+    } else {
+      await saveToCloud({version:3, checked, currentWeek, savedAt:new Date().toISOString()});
+    }
+  }catch(e){ setSaveStatus("Signed in, but cloud progress could not be loaded.", true); }
 }
 
 function resKey(w,d,r){ return w+"-"+d+"-"+r; }
@@ -969,6 +1029,26 @@ document.getElementById("resetBtn").addEventListener("click", ()=>{
   checked = {};
   saveProgress();
   render();
+});
+
+document.getElementById("signInBtn").addEventListener("click", async ()=>{
+  try{ await signInWithPopup(auth, googleProvider); }
+  catch(e){ setSaveStatus("Google sign-in was not completed.", true); }
+});
+document.getElementById("signOutBtn").addEventListener("click", async ()=>{
+  try{ await signOut(auth); }
+  catch(e){ setSaveStatus("Could not sign out.", true); }
+});
+
+onAuthStateChanged(auth, async (user)=>{
+  signedInUser = user;
+  const signInBtn = document.getElementById("signInBtn");
+  const signOutBtn = document.getElementById("signOutBtn");
+  const accountLabel = document.getElementById("accountLabel");
+  signInBtn.hidden = !!user;
+  signOutBtn.hidden = !user;
+  accountLabel.textContent = user ? `Syncing as ${user.email || "your Google account"}` : "";
+  if(user) await loadFromCloud();
 });
 
 (()=>{
